@@ -1,19 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+// On importe la librairie react
+import React from "react";
+// On importe la librairie react-dom (elle permet
+// d'afficher react sur la page)
+import { createRoot } from "react-dom/client";
+// On importe le composant App (le composant qui contiendra
+// l'intégralité de notre application)
+import App from "./App";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// On récupére la balise div#root de notre
+// page HTML
+const root = document.querySelector("#root");
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// Si il n'y a pas de balise root
+if (!root) {
+  // On léve un erreur
+  throw new Error("Oups ... il manque la balise root dans votre index.html");
+}
+
+// J'affiche le composant App à l'écran dans la balise
+// div#root
+createRoot(root).render(<App />);
