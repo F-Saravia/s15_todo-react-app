@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import * as UI from "../shared/ui";
+import uniqid from "uniqid";
+import { Link } from "react-router-dom";
+import BottomNav from "../shared/BottomNav";
 
 /**
  * Ce fichier contient le composant de l'écran
@@ -27,6 +30,7 @@ export type Todo = {
 
 export type Task = string;
 export type TaskList = Array<Todo>;
+
 function taskListToString(taskList: Array<Todo>): string {
   let retour = "";
   taskList.forEach(
@@ -44,61 +48,117 @@ export default function TodoList() {
     setTask(event.currentTarget.value);
   };
 
-  const addToDo_onPlusClick = () => {
-    if (!task) return;
-
-    // if (task != undefined && task != null && task.trim() != "") {
-    taskList.push({
-      id: String(taskList.length + 1),
-      label: task,
-      done: false,
-    });
-    setTaskList(taskList);
-    setTask("");
+  const addToDo_onEnter = (event: React.SyntheticEvent<HTMLInputElement>) => {
+    // if (!task) return;
+    // if (event.currentTarget.key === "Enter") {
+    //   // if (task != undefined && task != null && task.trim() != "") {
+    //   taskList.push({
+    //     id: String(taskList.length + 1),
+    //     label: task,
+    //     done: false,
+    //   });
+    //   setTaskList(taskList);
+    //   setTask("");
+    //   // }
     // }
   };
 
-  const addToDo_onEnter = () => {};
+  const addToDo_onPlusClick = () => {
+    if (!task) return;
+    setTaskList([
+      {
+        id: uniqid(),
+        label: task,
+        done: false,
+      },
+      ...taskList,
+    ]);
+    setTask("");
 
-  const toggleDone = (event: React.SyntheticEvent<HTMLParagraphElement>) => {
-    console.log(
-      `onDoneClick() :\n TaskList Before: ${taskListToString(taskList)}`
-    );
+    // if (task != undefined && task != null && task.trim() != "") {
+    // taskList.push({
+    //   id: uniqid(),
+    //   label: task,
+    //   done: false,
+    // });
+    // setTaskList(taskList);
+    // setTask("");
+    // }
+  };
+
+  /*
+   * idem que de faire:
+   * const toggleDone = (id:string) =>{ return fonction() { set...} }
+   *
+   */
+  const toggleDone = (todo: Todo) => () => {
     setTaskList(
-      taskList.map((todo, index) => {
-        if (todo.label === event.currentTarget.textContent)
+      taskList.map((t, index) => {
+        if (t.id === todo.id)
           return {
-            id: todo.id,
-            label: todo.label,
-            done: !todo.done,
+            ...t,
+            done: !t.done,
           };
-        return todo;
+        return t;
       })
-    );
-    console.log(
-      `onDoneClick() :\n TaskList After: ${taskListToString(taskList)}`
     );
   };
 
-  const deleteTodoFromTaskList = (event: React.SyntheticEvent<HTMLElement>) => {
-    console.log(
-      `onDeleteClick() :\n TaskList Before: ${taskListToString(taskList)}`
-    );
-    setTaskList(
-      taskList.filter(
-        (todo) =>
-          todo.label !== event.currentTarget.previousSibling?.textContent
-      )
-    );
-    console.log(
-      `onDeleteClick() :\n TaskList After: ${taskListToString(taskList)}`
-    );
+  // const toggleDone = (event: React.SyntheticEvent<HTMLParagraphElement>) => {
+  //   console.log(
+  //     `onDoneClick() :\n TaskList Before: ${taskListToString(taskList)}`
+  //   );
+  //   setTaskList(
+  //     taskList.map((todo, index) => {
+  //       if (todo.label === event.currentTarget.textContent)
+  //         return {
+  //           id: todo.id,
+  //           label: todo.label,
+  //           done: !todo.done,
+  //         };
+  //       return todo;
+  //     })
+  //   );
+  //   console.log(
+  //     `onDoneClick() :\n TaskList After: ${taskListToString(taskList)}`
+  //   );
+  // };
+
+  const deleteTodoFromTaskList =
+    (todo: Todo) => (e: React.SyntheticEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setTaskList(taskList.filter((t) => t.id !== todo.id));
+    };
+
+  // const deleteTodoFromTaskList = (event: React.SyntheticEvent<HTMLElement>) => {
+  //   console.log(
+  //     `onDeleteClick() :\n TaskList Before: ${taskListToString(taskList)}`
+  //   );
+  //   setTaskList(
+  //     taskList.filter(
+  //       (todo) =>
+  //         todo.label !== event.currentTarget.previousSibling?.textContent
+  //     )
+  //   );
+  //   console.log(
+  //     `onDeleteClick() :\n TaskList After: ${taskListToString(taskList)}`
+  //   );
+  // };
+
+  const deleteTaskList = (event: React.SyntheticEvent<HTMLElement>) => {
+    setTaskList([]);
+  };
+
+  const shareTaskList = (event: React.SyntheticEvent<HTMLElement>) => {
+    /**Mystère, mystère */
   };
 
   return (
     <UI.AppContainer>
       <UI.TopNav>
-        <UI.TopNavIcon className="fa-solid fa-circle-chevron-left"></UI.TopNavIcon>
+        <Link to="/">
+          <UI.TopNavIcon className="fa-solid fa-circle-chevron-left"></UI.TopNavIcon>
+        </Link>
         <UI.TopNavTitle>Petites Courses</UI.TopNavTitle>
       </UI.TopNav>
 
@@ -114,7 +174,11 @@ export default function TodoList() {
 
       <UI.StretchFlexContainer>
         <UI.InputContainer>
-          <UI.Input placeholder="votre todo ..." onChange={onTaskChange} />
+          <UI.Input
+            placeholder="votre todo ..."
+            onChange={onTaskChange}
+            onKeyUp={addToDo_onEnter}
+          />
           <UI.InputIcon
             className="fa-solid fa-circle-plus"
             onClick={addToDo_onPlusClick}
@@ -127,31 +191,32 @@ export default function TodoList() {
           ? ""
           : taskList.map((todo) => (
               <UI.Todo key={`${todo.id}`} done={todo.done}>
-                <UI.TodoLabel onClick={toggleDone}>{todo.label}</UI.TodoLabel>
+                <UI.TodoLabel onClick={toggleDone(todo)}>
+                  {todo.label}
+                </UI.TodoLabel>
                 <UI.TodoIcon
                   className="fa-solid fa-trash"
-                  onClick={deleteTodoFromTaskList}
+                  onClick={deleteTodoFromTaskList(todo)}
                 ></UI.TodoIcon>
               </UI.Todo>
             ))}
         ;
       </UI.TodoListContainer>
 
-      <UI.BottomNav>
-        <UI.BottomNavAction>
-          <UI.BottomNavShare>
-            <i className="fa-solid fa-share"></i>
-          </UI.BottomNavShare>
-          <UI.BottomNavDelete>
-            <i className="fa-solid fa-trash"></i>
-          </UI.BottomNavDelete>
-        </UI.BottomNavAction>
-
-        <UI.BottomNavMenu>
-          <UI.BottomNavItem className="fa-solid fa-bars"></UI.BottomNavItem>
-          <UI.BottomNavItem className="fa-solid fa-user"></UI.BottomNavItem>
-        </UI.BottomNavMenu>
-      </UI.BottomNav>
+      <BottomNav topBar={BottomTopBar()} />
     </UI.AppContainer>
   );
+
+  function BottomTopBar(): JSX.Element {
+    return (
+      <UI.BottomNavAction>
+        <UI.BottomNavShare onClick={shareTaskList}>
+          <i className="fa-solid fa-share"></i>
+        </UI.BottomNavShare>
+        <UI.BottomNavDelete onClick={deleteTaskList}>
+          <i className="fa-solid fa-trash"></i>
+        </UI.BottomNavDelete>
+      </UI.BottomNavAction>
+    );
+  }
 }
