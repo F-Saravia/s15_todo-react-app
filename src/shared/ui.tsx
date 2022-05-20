@@ -125,20 +125,31 @@ export const TagLabel = styled.p`
   font-weight: bold;
 `;
 
-export const InputContainer = styled.div`
+type InputContainerProps = {
+  display?: "white" | "black";
+};
+
+export const InputContainer = styled.div<InputContainerProps>`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid ${theme.colors.greenOcean};
+  border-bottom: 1px solid
+    ${(props) =>
+      props.display === "white" ? theme.colors.white : theme.colors.greenOcean};
 `;
 
-export const Input = styled.input`
+type InputProps = {
+  display?: "white" | "black";
+};
+
+export const Input = styled.input<InputProps>`
   display: flex;
   flex-grow: 2;
   background: none;
   border: none;
   padding: 0.6rem;
-  color: ${theme.colors.softBlack};
+  color: ${(props) =>
+    props.display === "white" ? theme.colors.white : theme.colors.softBlack};
 
   &:focus {
     outline: none;
@@ -159,7 +170,7 @@ export const TodoListContainer = styled.section`
 `;
 
 export type TodoProps = {
-  done: boolean;
+  done?: boolean;
 };
 
 export const Todo = styled.div<TodoProps>`
@@ -169,6 +180,9 @@ export const Todo = styled.div<TodoProps>`
     props.done ? theme.colors.validGreen : theme.colors.white};
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3) inset;
   align-items: center;
+  transition: all 0.5s;
+  color: ${(props) =>
+    props.done ? theme.colors.coldWhite : theme.colors.softBlack};
 `;
 
 export const TodoLabel = styled.p`
@@ -231,6 +245,43 @@ export const BottomNavMenu = styled.div`
 
 export const BottomNavItem = styled.i`
   font-size: 1.2rem;
+`;
+
+type GreenRightFrameProps = {
+  open?: boolean;
+};
+
+export const GreenRightFrame = styled.div<GreenRightFrameProps>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  background-color: ${theme.colors.greenOcean};
+  color: ${theme.colors.white};
+  transition: all 0.5s;
+  transform: ${(props) => (props.open ? `translateX(0)` : `translateX(105vw)`)};
+  z-index: 10;
+  flex-direction: column;
+  align-items: stretch;
+`;
+
+export const GreenFrameHeader = styled.div`
+  padding: 0 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+export const GreenFrameClose = styled.i`
+  font-size: 1.4rem;
+`;
+
+export const GreenFrameTitle = styled.p`
+  text-align: right;
+  font-size: 1.7rem;
+  font-family: "Lobster", sans-serif;
 `;
 
 // ===========

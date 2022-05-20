@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import * as UI from "../shared/ui";
-import uniqid from "uniqid";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import PubSub from "pubsub-js";
+import uniqid from "uniqid";
+
+import * as UI from "../shared/ui";
 import BottomNav from "../shared/BottomNav";
 
 /**
@@ -41,27 +43,47 @@ function taskListToString(taskList: Array<Todo>): string {
 }
 
 export default function TodoList() {
+  const [username, setUsername] = useState<string>("");
   const [task, setTask] = useState<Task>("");
   const [taskList, setTaskList] = useState<TaskList>([]);
+
+  useEffect(() => {
+    const localStoredUser = localStorage.getItem("user");
+    if (localStoredUser) setUsername(JSON.parse(localStoredUser).displayName);
+  }, []);
+
+  useEffect(() => {
+    console.log(
+      "Inside l'effet pour souscrire la todolist au topic changeusername"
+    );
+    const onUsernameChange = (topic: string, newUsername: string) => {
+      console.log(
+        `on utilise le param newUsername qui vient lui même de la souscription, newUsername=${username}`
+      );
+      setUsername(newUsername);
+    };
+    PubSub.subscribe("updatedUsername", onUsernameChange);
+  }, []);
 
   const onTaskChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
     setTask(event.currentTarget.value);
   };
 
-  const addToDo_onEnter = (event: React.SyntheticEvent<HTMLInputElement>) => {
-    // if (!task) return;
-    // if (event.currentTarget.key === "Enter") {
-    //   // if (task != undefined && task != null && task.trim() != "") {
-    //   taskList.push({
-    //     id: String(taskList.length + 1),
-    //     label: task,
-    //     done: false,
-    //   });
-    //   setTaskList(taskList);
-    //   setTask("");
-    //   // }
-    // }
-  };
+  // !!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!
+  // const addToDo_onEnter = (event: React.SyntheticEvent<HTMLInputElement>) => {
+  // if (!task) return;
+  // if (event.currentTarget.key === "Enter") {
+  //   // if (task != undefined && task != null && task.trim() != "") {
+  //   taskList.push({
+  //     id: String(taskList.length + 1),
+  //     label: task,
+  //     done: false,
+  //   });
+  //   setTaskList(taskList);
+  //   setTask("");
+  //   // }
+  // }
+  // };
 
   const addToDo_onPlusClick = () => {
     if (!task) return;
@@ -167,7 +189,7 @@ export default function TodoList() {
           <UI.TagIcon className="fa-solid fa-user"></UI.TagIcon>
           <UI.TagLabelContainer>
             <UI.TagLabelEntitled>Par</UI.TagLabelEntitled>
-            <UI.TagLabel>John</UI.TagLabel>
+            <UI.TagLabel>{username}</UI.TagLabel>
           </UI.TagLabelContainer>
         </UI.Tag>
       </UI.CenteredFlexContainer>
@@ -177,7 +199,7 @@ export default function TodoList() {
           <UI.Input
             placeholder="votre todo ..."
             onChange={onTaskChange}
-            onKeyUp={addToDo_onEnter}
+            // onKeyUp={addToDo_onEnter}
           />
           <UI.InputIcon
             className="fa-solid fa-circle-plus"

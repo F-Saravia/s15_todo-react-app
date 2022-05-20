@@ -17,8 +17,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/liste/:id" element={<TodoList />} />
-          <Route path="/connexion" element={<Login />} />
-          <Route path="/inscription" element={<Subscription />} />
+          <Route path="/signin" element={<Login />} />
+          <Route path="/signup" element={<Subscription />} />
         </Routes>
       </BrowserRouter>
     </>

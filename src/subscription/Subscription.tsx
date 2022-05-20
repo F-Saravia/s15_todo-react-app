@@ -1,8 +1,9 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
-import * as UI from "../shared/ui";
 import { auth } from "../utils/Firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+
+import * as UI from "../shared/ui";
 
 export default function Subscription() {
   const [username, setUsername] = useState<string>("");
@@ -59,6 +60,7 @@ export default function Subscription() {
           name="username"
           placeholder="Nom d'utilisateur"
           onChange={onUseStateChange(setUsername)}
+          value={username}
         />
       </UI.InputContainer>
       <p>{usernameError}</p>
@@ -67,6 +69,7 @@ export default function Subscription() {
           name="email"
           placeholder="Email"
           onChange={onUseStateChange(setEmail)}
+          value={email}
         />
       </UI.InputContainer>
       <UI.InputContainer>
@@ -74,6 +77,7 @@ export default function Subscription() {
           name="password"
           placeholder="Mot de Passe"
           onChange={onUseStateChange(setPassword)}
+          value={password}
         />
       </UI.InputContainer>
       <button type="submit">S'inscrire</button>
